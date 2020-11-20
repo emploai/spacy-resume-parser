@@ -1,8 +1,5 @@
 # Spacy Based Resume Parser
 This server is based on spaCy. It is used to train a custom model, which the parser uses to extract data. The data is then displayed in a JSON format.
-
-**NOTE: This parser is still a work in progress.**
-
 As of right now, there's a demo document that the parser is able to accurately pull data from. Please do check it out. Further work will be done such that the parser is able to accurately extract data regardless of the resume format and also be able to pull data from tables, boxes, etc. 
 
 ## Setup
