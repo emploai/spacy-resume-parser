@@ -11,16 +11,7 @@ import logging
 LABEL = "COL_NAME"
 
 def trim_entity_spans(data: list) -> list:
-  """Removes leading and trailing white spaces from entity spans.
-
-  Args:
-    data (list): The data to be cleaned in spaCy JSON format.
-
-  Returns:
-    list: The cleaned data.
-  """
   invalid_span_tokens = re.compile(r'\s')
-
   cleaned_data = []
   for text, annotations in data:
     entities = annotations['entities']
@@ -79,13 +70,7 @@ TRAIN_DATA = trim_entity_spans(convert_dataturks_to_spacy("./training/data/train
   n_iter=("Number of training iterations", "option", "n", int),
 )
 
-def main(
-  model=None,
-  new_model_name="resume_parser_model",
-  output_dir='./models/resume_entity_parser',
-  n_iter=5
-):
-  """Set up the pipeline and entity recognizer, and train the new entity."""
+def main(model=None, new_model_name="resume_parser_model", output_dir='./models/resume_entity_parser', n_iter=5):
   random.seed(0)
   if model is not None:
     nlp = spacy.load(model)  # load existing spaCy model

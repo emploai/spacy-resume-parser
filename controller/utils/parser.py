@@ -11,13 +11,7 @@ nlp = spacy.load('en_core_web_sm')
 custom_nlp = spacy.load('./models/resume_entity_parser')
 
 class ResumeParser(object):
-  def __init__(
-    self,
-    resume,
-    skills_file=None,
-    custom_regex=None
-  ):
-    
+  def __init__(self, resume, skills_file=None, custom_regex=None):
     self.__skills_file = skills_file
     self.__custom_regex = custom_regex
     self.__matcher = Matcher(nlp.vocab)
@@ -27,19 +21,8 @@ class ResumeParser(object):
       'education': [],
       'skills': [],
       'summary': [],
-      
-      # 'name': None,
-      # 'email': None,``
-      # 'mobile': None,
-      # 'skills': None,
-      # 'institutions': None,
-      # 'degree': None,
-      # 'designation': None,
-      # 'experience': None,
-      # 'companies': None,
-      # 'numpages': None,
-      # 'yofexp': None,
     }
+
     self.__resume = resume
     if not isinstance(self.__resume, io.BytesIO):
       ext = os.path.splitext(self.__resume)[1].split('.')[1]
@@ -63,15 +46,10 @@ class ResumeParser(object):
     name = utils.extract_name(self.__nlp, matcher=self.__matcher)
     email = utils.extract_email(self.__text)
     mobile = utils.extract_mobile(self.__text, self.__custom_regex)
-    skills = utils.extract_skills(
-      self.__nlp,
-      self.__noun_chunks,
-      self.__skills_file
-    )
+    skills = utils.extract_skills(self.__nlp, self.__noun_chunks, self.__skills_file)
 
     # Extracting Sections From the Document
     sections = utils.extract_entity_sections(self.__text_raw)
-    print('Sections', sections)
 
     ''' EXTRACTING ALL DETAILS '''
     # ---------------------------------------------------------------------------
@@ -133,8 +111,6 @@ class ResumeParser(object):
             ent = utils.extract_entities_wih_spacy_model(nlp(line))
             if 'PERCENT' in ent:
               education[key]['GPA'] = ent['PERCENT'][0]
-            if 'CARDINAL' in ent:
-              education[key]['GPA'] = ent['CARDINAL'][0]
             # Getting Degree
             custom_ent = utils.extract_entities_wih_custom_model(custom_nlp(' '.join(education[key]['summary'])))
             if 'Degree' in custom_ent:
@@ -177,11 +153,11 @@ class ResumeParser(object):
         try:
           self.__details['education'][0]['degree'] = cust_ent['Degree'][0]
         except (KeyError, IndexError) as e:
-          pass
+          pass  
     except (KeyError, IndexError) as e:
       # Extract University Namey
       try:
-          self.__details['education'][0]['institution'] = cust_ent['College Name'][0]
+        self.__details['education'][0]['institution'] = cust_ent['College Name'][0]
       except (KeyError, IndexError) as e:
         pass
       # Extract Degree Name
@@ -265,11 +241,7 @@ class ResumeParser(object):
         try:
           self.__details['summary'] = sections['summary']
           try:
-            # print(sections['experience'])
-            exp = round(
-              utils.get_yofexp(sections['experience']) / 12,
-              2
-            )
+            exp = round(utils.get_yofexp(sections['experience']) / 12, 2)
             self.__details['yofexp'] = exp
           except (KeyError, IndexError) as e:
             self.__details['yofexp'] = 0
@@ -289,11 +261,7 @@ class ResumeParser(object):
         try:
           self.__details['summary'] = sections['summary']
           try:
-            # print(sections['experience'])
-            exp = round(
-              utils.get_yofexp(sections['experience']) / 12,
-              2
-            )
+            exp = round(utils.get_yofexp(sections['experience']) / 12, 2)
             self.__details['yofexp'] = exp
           except (KeyError, IndexError) as e:
             self.__details['yofexp'] = 0
@@ -320,10 +288,7 @@ if __name__ == '__main__':
       resumes.append(file)
 
   results = [
-    pool.apply_async(
-      resume_result_wrapper,
-      args=(x,)
-    ) for x in resumes
+    pool.apply_async(resume_result_wrapper, args=(x,)) for x in resumes
   ]
 
   results = [p.get() for p in results]
